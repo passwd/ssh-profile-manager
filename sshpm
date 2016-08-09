@@ -1,0 +1,99 @@
+#!/bin/bash
+
+function log_line {
+    if [[ "$2" != false ]]; then
+        DATE=`date +%H:%M:%S`
+        echo "[$DATE] $1"
+    fi
+}
+
+# defaults
+def_server="127.0.0.1"
+def_username=$USER
+def_key_file=""
+def_port="22"
+def_args=""
+
+verbose=false
+profile_name=false
+
+while getopts vp:s:a:h opts; do
+    case ${opts} in
+       v) verbose=${OPTARG} ;;
+       p) profile_name=${OPTARG} ;;
+       s) def_server=${OPTARG} ;;
+       a) def_args=${OPTARG} ;;
+       h)
+        echo "Shell Profile Manager v1.0"
+        echo "Created by: Kevin Klein <kevin@cheese.is>"
+        echo ""
+
+        echo "This scirpt looks for config files in ~/.sshpm"
+
+        echo ""
+        echo "Arguments"
+        echo "    -v Verbose output from the ssh profile manager, does not affect ssh"
+        echo "    -p The connection profile to use"
+        echo "    -h Override the config file server (required if the server config is not set)"
+        echo "    -a Additional arguments to be passed to ssh"
+        echo ""
+        echo "    -h Show this message"
+        echo ""
+
+        echo "Example"
+        echo '    $ sshpm -v -p my_profile'
+        exit
+       ;;
+    esac
+done
+
+if [[ "$profile_name" == false ]]; then
+    log_line 'error: you must select a profile'
+    exit 1
+fi
+
+conf_file=$HOME/.sshpm/$profile_name.conf
+if [ ! -f $conf_file ]; then
+  log_line "Please create a config file in: \"$HOME/.sshpm/\" for \"$profile_name\""
+  exit 1
+fi
+
+log_line "loding profile config..." $verbose
+
+. $conf_file
+
+log_line "starting connection using \"$profile_name\""
+
+
+if [[ "$server" != "" ]]; then
+    def_server=$server
+
+fi
+log_line "connecting to $def_server" $verbose
+
+if [[ "$port" != "" ]]; then
+    def_port=$port
+    log_line "on port $def_port" $verbose
+fi
+
+if [[ "$username" != "" ]]; then
+    def_username=$username
+fi
+log_line "with user $def_username" $verbose
+
+if [[ "$key_file" != "" ]]; then
+    eval def_key_file=$key_file
+    if [ ! -f "$def_key_file" ]; then
+        log_line "error: could not find key file: \"$def_key_file\""
+        exit 1
+    fi
+fi
+log_line "loaded ssh certificate $def_key_file" $verbose
+
+if [[ "$args" != "" ]]; then
+    def_args=$args
+    log_line "using custom arguments $def_args" $verbose
+fi
+
+ssh $def_args -p $def_port -l $def_username -i $def_key_file $def_server
+exit
