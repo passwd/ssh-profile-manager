@@ -41,15 +41,39 @@ while getopts vp:s:a:h opts; do
         echo ""
 
         echo "Example"
+        echo '  # run with a profile'
         echo '    $ sshpm -v -p my_profile'
+        echo ''
+        echo '  # choose profile by passing no arguments'
+        echo '    $ sshpm'
         exit
        ;;
     esac
 done
 
 if [[ "$profile_name" == false ]]; then
-    log_line 'error: you must select a profile'
-    exit 1
+
+    if [[ -d "$HOME/.sshpm" ]]; then
+        filelist=()
+        for f in ${HOME}/.sshpm/*; do
+            file=$(basename $f)
+            file=$(echo "$file" | sed 's/\.conf//')
+            filelist+=("$file")
+        done
+        select profile in ${filelist[@]};
+        do
+            profile_name=$profile
+            break
+        done
+    else
+        log_line 'error: no config directory found'
+        exit 1
+    fi
+
+    if [[ "$profile_name" == false ]]; then
+        log_line 'error: you must select a profile'
+        exit 1
+    fi
 fi
 
 conf_file=$HOME/.sshpm/$profile_name.conf
