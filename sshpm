@@ -62,7 +62,7 @@ if [[ "$profile_name" == false ]]; then
         done
         select profile in ${filelist[@]};
         do
-            profile_name="$profile.conf"
+            profile_name=$profile
             break
         done
     else
@@ -76,8 +76,9 @@ if [[ "$profile_name" == false ]]; then
     fi
 fi
 
+echo "$profile_name"
 conf_file=$HOME/.sshpm/$profile_name.conf
-if [ ! -f $conf_file ]; then
+if [ ! -f "$conf_file" ]; then
   log_line "Please create a config file in: \"$HOME/.sshpm/\" for \"$profile_name\""
   exit 1
 fi
