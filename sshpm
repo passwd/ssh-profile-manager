@@ -76,7 +76,6 @@ if [[ "$profile_name" == false ]]; then
     fi
 fi
 
-echo "$profile_name"
 conf_file=$HOME/.sshpm/$profile_name.conf
 if [ ! -f "$conf_file" ]; then
   log_line "Please create a config file in: \"$HOME/.sshpm/\" for \"$profile_name\""
@@ -89,10 +88,8 @@ log_line "loding profile config..." $verbose
 
 log_line "starting connection using \"$profile_name\""
 
-
-if [[ "$server" != "" ]]; then
+if [[ "$server" != "" && $def_server == "" ]]; then
     def_server=$server
-
 fi
 log_line "connecting to $def_server" $verbose
 
