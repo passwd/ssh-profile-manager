@@ -88,7 +88,7 @@ log_line "loding profile config..." $verbose
 
 log_line "starting connection using \"$profile_name\""
 
-if [[ "$server" != "" && $def_server == "" ]]; then
+if [[ "$server" != "" && "$def_server" == "" ]]; then
     def_server=$server
 fi
 log_line "connecting to $def_server" $verbose
