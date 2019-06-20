@@ -8,7 +8,7 @@ function log_line {
 }
 
 # defaults
-def_server="127.0.0.1"
+def_server=""
 def_username=$USER
 def_key_file=""
 def_port="22"
@@ -112,10 +112,16 @@ if [[ "$key_file" != "" ]]; then
 fi
 log_line "loaded ssh certificate $def_key_file" $verbose
 
-if [[ "$args" != "" ]]; then
+args="$(echo "$args" | sed 's/\"/\\"/g')"
+
+if [[ $args != "" ]]; then
     def_args=$args
     log_line "using custom arguments $def_args" $verbose
 fi
 
-ssh $def_args -p $def_port -l $def_username -i $def_key_file $def_server
+full_cmd="ssh $def_args -p $def_port -l $def_username -i $def_key_file $def_server"
+
+log_line "running cmd: $full_cmd" $verbose
+
+eval $full_cmd
 exit
