@@ -7,7 +7,7 @@ if [ ! -d $HOME/.sshpm ]; then
 fi
 
 chmod u+x $DIR/sshpm
-cp $DIR/sshpm /usr/local/bin/
+cp -rf $DIR/sshpm /usr/local/bin/
 
 if [ -f /usr/local/bin/sshpm ]; then
   echo 'Install successful!'
